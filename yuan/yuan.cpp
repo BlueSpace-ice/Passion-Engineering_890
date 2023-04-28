@@ -45,6 +45,10 @@ Mat precessing(Mat image)
 //计算差异最小的三个数        (无需改动，跳过)
 void find_min_diff_indices(double arr[], int n, int& ind1, int& ind2, int& ind3)
 {
+	if (n <= 3) {
+		cout << "find_min_diff_indices error" << endl;
+		return;
+	}
 	double min_var = numeric_limits<double>::infinity();
 	int idx1 = -1, idx2 = -1, idx3 = -1;     // 方差最小的三个数的下标
 	for (int i = 1; i < n - 1; i++)
@@ -62,6 +66,21 @@ void find_min_diff_indices(double arr[], int n, int& ind1, int& ind2, int& ind3)
 	ind1 = idx1;
 	ind2 = idx2;
 	ind3 = idx3;
+}
+
+//找到三个三角形的相似度返回
+double drawMostSimilarContours(const std::vector<std::vector<cv::Point>>& contours)
+{
+	if (contours.size() != 3)
+	{
+		std::cout << "error" << std::endl;
+		return 0;
+	}
+	double ans = 0;
+	ans += matchShapes(contours[0], contours[1], CONTOURS_MATCH_I3, 0);
+	ans += matchShapes(contours[1], contours[2], CONTOURS_MATCH_I3, 0);
+	ans += matchShapes(contours[2], contours[0], CONTOURS_MATCH_I3, 0);
+	return ans;
 }
 
 //计算差异最小的三个角度
@@ -158,6 +177,10 @@ vector<Point2f> findApexs(vector<RotatedRect> minRect, vector<vector<cv::Point>>
 // 检测图像中的三角形并计算每个三角形的三条边的角度和长度
 vector<Triangle> detectTriangles(const vector<vector<cv::Point>>& contours, Mat& cap)
 {
+	if (contours.size() <= 3) {
+		cout << "detectTriangles error" << endl;
+		return *new vector<Triangle>;
+	}
 	vector<Triangle> triangles;
 
 	// 对每个轮廓进行处理
@@ -350,7 +373,8 @@ vector<int> handleLight(vector<vector<cv::Point>> contours, vector<RotatedRect> 
 			myfile3 << triangle[Minindex[i]].triangle_points[j] << ",";
 		myfile3 << endl;
 	}
-
+	if (drawMostSimilarContours(tmp_contours) > 10)
+		return *new vector<int>;
 	//结束插入调试
 	if (Minindex.size() == 3) {
 		//找第四个顶点+转换参数+加入掩码机制
@@ -772,8 +796,10 @@ void all(Mat image, int capcols, int caprows,VisionData& visiondata)
 	std::cout << "precessing finish" << endl;
 	vector<Point2f> vertexs;//这是四个顶点
 	vertexs = handleMat(processmat, image, capcols, caprows, visiondata);//返回四个顶点
-	if (vertexs.size() != 4)
+	if (vertexs.size() != 4){
+		visiondata.isDetected = false;
 		return;
+	}
 	vertexs = uuusortxy(vertexs);
 	
 	//vertexs = uuusortxy(vertexs);
