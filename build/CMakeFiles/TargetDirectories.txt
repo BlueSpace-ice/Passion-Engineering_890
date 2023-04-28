@@ -1,0 +1,3 @@
+/home/nuc/桌面/代码整合版/build/CMakeFiles/rebuild_cache.dir
+/home/nuc/桌面/代码整合版/build/CMakeFiles/edit_cache.dir
+/home/nuc/桌面/代码整合版/build/CMakeFiles/Test.dir
